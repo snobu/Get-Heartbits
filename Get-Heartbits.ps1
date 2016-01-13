@@ -18,14 +18,15 @@
     $memfreeMB = [Math]::Round($memfree / 1024, 0)
 
     $pf = (Get-WmiObject Win32_PerfFormattedData_PerfOS_memory).PageFaultsPerSec
+    $hardpage = (Get-WmiObject Win32_PerfFormattedData_PerfOS_memory).PagesPerSec
     $iowrite = (Get-WmiObject Win32_PerfFormattedData_PerfProc_Process | Where-Object { $_.Name -eq "_Total"}).IOWriteOperationsPersec
     $cpu = (Get-WmiObject Win32_Processor).LoadPercentage
 
     $timestamp = $(Get-Date).ToUniversalTime()
 
-    Write-Output "$timestamp RX=$RX MBps, TX=$TX MBps, CPU=$cpu, FreePhysicalMemory=$memfreeMB MB, PageFaultsPerSec=$pf, DiskIOWritePerSec=$iowrite"
-    Write-Output "$timestamp RX=$RX MBps, TX=$TX MBps, CPU=$cpu, FreePhysicalMemory=$memfreeMB MB, PageFaultsPerSec=$pf, DiskIOWritePerSec=$iowrite" |
-        Out-File pulse.txt -Append
+    $out = Write-Output "$timestamp RX=$RX MBps, TX=$TX MBps, CPU=$cpu, FreePhysicalMemory=$memfreeMB MB, PageFaultsPerSec=$pf, PagesPerSec=$hardpage, DiskIOWritePerSec=$iowrite"
+    $out
+    $out | Out-File -Append pulse.txt
 }
 
 while (1)
